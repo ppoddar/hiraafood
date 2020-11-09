@@ -76,6 +76,7 @@ if [[ $REMOTE -eq 1 ]]; then
         docker container ls -aq | xargs docker container stop
         docker container ls -aq | xargs docker container rm
         docker run -d -P --rm hiraafood
+        exit 0
 EOSSH
 else
     info 'deploying '$APPNAME' dockerized application in stage. http://localhost/' 
