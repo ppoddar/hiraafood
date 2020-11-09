@@ -73,13 +73,12 @@ if [[ $REMOTE -eq 1 ]]; then
     check_uncommited
     ssh -tt  -i $PEM ec2-user@$HOST << EOSSH
         docker build --rm --tag hiraafood https://github.com/ppoddar/hiraafood.git
-        docker container ls -aq | xargs docker container stop
-        docker container ls -aq | xargs docker container rm
-        docker run -d -P --rm hiraafood
+        docker container ps -aq | xargs docker container stop
+        docker run -d -p80:80 --rm hiraafood
         exit 0
 EOSSH
 else
     info 'deploying '$APPNAME' dockerized application in stage. http://localhost/' 
     docker build --rm --tag hiraafood .
-    docker run -d -P --rm hiraafood 
+    docker run -d -p80:80 --rm hiraafood 
 fi
