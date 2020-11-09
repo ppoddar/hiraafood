@@ -8,6 +8,7 @@ COPY data/ ./data/
 COPY config/ ./config/
 
 RUN npm install --no-optional
-EXPOSE 8080
 
-CMD ["node", "app.js", "-p", "8080"]
+
+EXPOSE 80
+CMD ["node", "app.js"]

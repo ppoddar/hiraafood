@@ -33,7 +33,7 @@ class Hiraafood {
     constructor() {
         this.cli        = new CommandLine()
         this.secure     = this.cli.isPresent('--secure')
-        this.port       = this.cli.getOption('-p')
+        this.port       = this.cli.getOption('-p', '80')
         this.docroot    = 'public'
         const configFileName  = this.cli.getOption('-c', 'config/config.yml')
         this.config     = this.readFile(configFileName)

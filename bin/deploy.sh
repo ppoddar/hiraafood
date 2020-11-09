@@ -6,21 +6,9 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 HOME_DIR=`cd $DIR/..;pwd`
 
-APPNAME=hiraafood
-HOSTNAME=anna
 REMOTE=0
-DOCKER_USER=ppoddar
 PROD_USER=ec2-user
 
-DOCKER_REPO=anna
-IMAGE_NAME=anna_image
-DOCKER_IMAGE=$DOCKER_USER/$DOCKER_REPO:$IMAGE_NAME
-
-GIT_URL=git@github.com:ppoddar/anna.git 
-
-LOCALHOST=`ipconfig getifaddr en0`
-
-SRC=.
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m' 
 COLOR_GREEN='\033[0;32m'
@@ -49,24 +37,10 @@ function check_uncommited {
             error 'can not deploy to production with uncommitted files'
             git status -s
             exit 1
-        else
-            warn 'there are uncommited files'
-            UNCOMMITED=1
         fi
     fi
 }
 
-function create_docker_image {
-    pushd $HOME_DIR > /dev/null
-    info 'creating docker image '$DOCKER_IMAGE
-    docker build $SRC -t $DOCKER_IMAGE
-    popd > /dev/null
-}
-
-function push_docker_image {
-    info 'pushing '$DOCKER_IMAGE
-    docker login --username=$DOCKERHUB_USER; docker push $DOCKER_IMAGE
-}
 
 
 function populate_menu {
@@ -105,25 +79,23 @@ if [[ $REMOTE -eq 1 ]]; then
 else
     info 'deploying '$APPNAME' dockerized application in stage'  
 fi
-check_uncommited
-create_docker_image
-push_docker_image
 if [[ $REMOTE -eq 1 ]]; then
 PEM=$DIR/anna.pem
+check_uncommited
 ssh -tt  -i $PEM $PROD_USER@$REMOTE_HOST << EOSSH
-    git clone https://github.com/ppoddar/anna.git
-    cd anna
-    docker build - anna .
-    docker run -d -p $PORT:8080 --rm $DOCKER_IMAGE 
+    docker build --rm --tag hiraafood https://github.com/ppoddar/hiraafood.git
+    docker run -P hiraafood
 EOSSH
 else
     info 'running dockerized application. access it as port '$PORT
-    docker run -d -p $PORT:8080 --rm $DOCKER_IMAGE
+    docker build --rm --tag hiraafood .
+    docker run -d -P --rm hiraafood
 fi
 
 
-sleep 2
-populate_menu
+
+#sleep 2
+#populate_menu
 
 
 
