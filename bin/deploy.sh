@@ -10,8 +10,6 @@ APPNAME=hiraafood
 REMOTE=0
 PROTOCOL=http
 HOST=localhost
-#  port for staging in localhost
-PORT=8080
 
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m' 
@@ -53,7 +51,6 @@ while [[ $# -gt 0 ]]; do
         -r)
             REMOTE=1
             HOST=hiraafood.com
-            PORT=80
             shift
             ;;
         -h|--help|-?)
@@ -78,10 +75,10 @@ if [[ $REMOTE -eq 1 ]]; then
         docker build --rm --tag hiraafood https://github.com/ppoddar/hiraafood.git
         docker container ls -aq | xargs docker container stop
         docker container ls -aq | xargs docker container rm
-        docker run -d -p80:8080 --rm hiraafood
+        docker run -d -P --rm hiraafood
 EOSSH
 else
     info 'deploying '$APPNAME' dockerized application in stage. http://localhost/' 
     docker build --rm --tag hiraafood .
-    docker run -d -p80:8080 --rm hiraafood 
+    docker run -d -P --rm hiraafood 
 fi

@@ -7,7 +7,6 @@ HOME_DIR=`cd $DIR/..;pwd`
 # default to stage enviroment
 PROTOCOL=http
 HOST=localhost
-PORT=8080
 DATA_DIR=$HOME_DIR/data/menu
 # -----------------------------------------------------------
 while [[ $# -gt 0 ]]; do
@@ -16,7 +15,6 @@ while [[ $# -gt 0 ]]; do
         -r)
             PROTOCOL=http
             HOST=hiraafood.com
-            PORT=80
             shift
             ;;
         --data)
@@ -38,10 +36,10 @@ done
 data_files=`ls $DATA_DIR/*.json`
 for data_file in $data_files
 do
-   curl -X POST $PROTOCOL://$HOST:$PORT/item \
+   curl -X POST $PROTOCOL://$HOST/item \
     -H "Content-Type:application/json" \
     -d @$data_file
 done
 
-
+curl $PROTOCOL://$HOST/item/catalog/ | jq
 
