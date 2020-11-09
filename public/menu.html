@@ -1,0 +1,156 @@
+<!-- thesde pages are HTML fragments that are dynamically loaded -->
+<!-- into 'main' area of the page -->
+<!-- the script in this page are executed -->
+
+<!-- this page shows the categorized menu items. -->
+
+<div id='menu-categories' class='w3-bar w3-yellow'></div>
+<div id='item-list'></div>
+
+
+<script>
+    var catalog = {}
+    var categorized_items = {}
+    var category_order = [
+        {key:'veg', label:'Vegeterian'},
+        {key:'non-veg', label: 'Non-Veg'}
+    ]
+    $.ajax('item/catalog')
+    .done(function(data){
+        // response is a dictionary of items indexed by sku
+        catalog  = data
+        categorized_items = categorizeItems(catalog)
+        for (var i = 0; i < category_order.length; i++) {
+            const category = category_order[i]
+            if (!(category.key in categorized_items)) {
+                alert(`key ${category.key} is not in categorized_items`)
+                // show uncategorized items
+            } else {
+                const $category = createMenuCategory(category, categorized_items[category.key])
+                $('#menu-categories').append($category)
+                // show fisr tcategory of items
+                if (i == 0) {
+                    $category.trigger('click')
+                }
+            }
+        }
+
+        $('#menu-categories').append(createSearchBox())
+    })
+    .fail(function(err){
+        console.error(err)
+
+    });
+
+    function createSearchBox() {
+        var $search = $('<span>')
+        
+        var $input = $('<input>')
+        var $icon = $('<span>')
+        $icon.text('search')
+        $icon.addClass('material-icons')
+        $search.append([$input, $icon])
+        $search.addClass('w3-bar-item w3-right')
+        $input.keypress(function(event){
+            var keycode = (event.keyCode ? event.keyCode : event.which);
+            if (keycode == '13') {
+                showSearchResult($input.val())
+            }
+        });
+        $icon.on('click', function(event){
+            showSearchResult($input.val())
+        });
+        return $search
+    }
+
+    function findItems(key) {
+        console.log(`seacrh for ${key}`)
+        var result = []
+        for (var sku in catalog) {
+            var item = catalog[sku]
+            if (item.name.indexOf(key) != -1) {
+                result.push(item)
+            }
+        }
+        console.log(`result ${result}`)
+        return result;
+    }
+
+    function showSearchResult(key) {
+        $('#menu-categories .w3-bar-item').removeClass('active')
+        var searchResult = findItems(key)
+        showItemList(searchResult)
+
+    }
+    /*
+     * create a navigation item when clicked renders list of given items
+     */
+    function createMenuCategory(category, item_list) {
+        console.log(`createMenuCategory ${category.key}:${category.label}`)
+        const $menu_category = $('<div>')
+        $menu_category.addClass('w3-bar-item')
+        $menu_category.text(category.label)
+
+        $menu_category.on('click', function() {
+            $(this).siblings().removeClass('active')
+            //alert(`menu category ${category.key} clicked`)
+            //console.log(`menu category ${category.key} clicked`)
+            //console.log(`showItemList ${category.key}:${category.label}`)
+            $(this).addClass('active')
+            showItemList(item_list)
+            
+        })
+        return $menu_category
+    }
+    /*
+     * Categorizes list of items
+     * An item can be in multiple categories
+     * @param dictionary of items indexed by sku
+     * @return a dictionary. key: server category value: list of Items
+     */
+    function categorizeItems(items) {
+        //console.log(`categorizeItems ${items.length} items`)
+        var categorized_items = {}
+        for (var sku in items) {
+            const item = items[sku]
+            //console.log(`categorizeItems item ${sku} categories:${item.categories}`)
+            for (var i = 0; i < item.categories.length; i++) {
+                var cat = item.categories[i]
+                var item_list = (cat in categorized_items) ? categorized_items[cat] : []
+                item_list.push(item)
+                categorized_items[cat] = item_list
+            }
+        }
+        //console.log(`item categories: ${Object.keys(categorized_items)}`)
+        return categorized_items
+    }
+
+    /*
+     * populates a list with items that are rendered with Mustache template 
+     */
+    var item_template = 
+        `<div>
+            <img src={{image}}>
+            <b>{{name}}</b>
+         </div>
+        `
+    function showItemList(item_list) {
+        const $itemList = $('#item-list')
+        $itemList.empty()
+        for (var i = 0; i < item_list.length; i++) {
+            var item = item_list[i]
+            var $item = renderItem(item_template, item)
+            $itemList.append($item)
+        }
+    }
+
+
+    function renderItem(item_template, item) {
+        var item_html = Mustache.render(item_template, item)
+        return $(item_html)
+
+    }
+
+   
+</script>
+

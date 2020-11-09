@@ -1,0 +1,14 @@
+sku: 102
+name: non-vegeterian thali
+categories: 
+  - non-veg
+  - chicken
+price: 15.00
+additional_price: 
+  price: 20.00 
+  comment: full plate
+
+description: >
+   Three vegetable served with served with rich 2 chapatis and mutton
+image: /images/item/veg-thali.jpg
+

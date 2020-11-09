@@ -1,0 +1,20 @@
+# --------------------------------------------------------
+# a menu item in YAML format
+# --------------------------------------------------------
+# every item is uniquely identified by a SKU
+sku: 101  
+# Name of an item
+name: Vegeterian Thali
+# an item may belong to one or more categories
+categories: 
+  - veg
+# price of an item
+price: 5.00
+# description can be a multiline text
+# In YAML, a multiline text is written with a > symbol in the beginning
+description: >
+   Three vegetable served with served with rich 2 chapatis
+
+# an image file location 
+image: /images/item/veg-thali.jpg
+

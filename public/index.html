@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<head>
+    <!-- jQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <!-- Mustache -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/2.3.0/mustache.min.js"></script>
+
+    <!-- w3.CSS -->
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    rel="stylesheet">
+    <style>
+        .active {
+            font-weight:bold;
+        }
+
+    </style>
+</head>
+
+<body>
+    <img src='/images/logo-1024x1024.png'>
+    <!-- main nvaigation bar -->
+    <div id='nav-bar' class='w3-bar w3-red'></div>
+    <!-- each section/page of the application dynamically loaded -->
+    <div id='main'></div>
+
+
+
+
+    <script>
+        var navigation_items = [
+            {key:'menu',   label:'Menu',    href:'./menu.html'},
+            {key:'contact',label:'Contact', href:'./contact.html'},
+            {key:'about',  label:'About',   href:'./about.html'}
+        ]
+        function create_navigation_bar(navigation_items) {
+            const $nav_bar = $('#nav-bar')
+            for (var i = 0; i < navigation_items.length; i++) {
+                $nav_bar.append(create_navigation_item(navigation_items[i]))
+            }
+        }
+
+        function create_navigation_item(nav_item) {
+            const $nav_item = $('<div>')
+            $nav_item.addClass('w3-bar-item')
+            $nav_item.text(nav_item.label)
+            $nav_item.on('click', function() {
+                console.log(`menu item ${nav_item.key} clicked. show ${nav_item.href}`)
+                $('#main').load(nav_item.href)
+            })
+            return $nav_item
+        }
+        
+        create_navigation_bar(navigation_items)  
+            
+
+    </script>
+
+</body>
