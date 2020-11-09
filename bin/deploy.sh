@@ -6,14 +6,18 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 HOME_DIR=`cd $DIR/..;pwd`
 
+APPNAME=hiraafood
 REMOTE=0
-PROD_USER=ec2-user
+PROTOCOL=http
+HOST=localhost
+#  port for staging in localhost
+PORT=8080
 
 COLOR_RED='\033[0;31m'
 COLOR_RESET='\033[0m' 
 COLOR_GREEN='\033[0;32m'
 COLOR_YELLOW='\033[0;33m'
-PORT=8090
+
 
 function warn {
     echo $COLOR_YELLOW***WARN:$1$COLOR_RESET
@@ -34,22 +38,13 @@ function check_uncommited {
         echo 
     else 
         if [[ $REMOTE -eq 1 ]]; then
-            error 'can not deploy to production with uncommitted files'
+            warn 'deploying in production with uncommitted files'
             git status -s
-            exit 1
         fi
     fi
 }
 
 
-
-function populate_menu {
-    echo 'populate menu'
-    node $HOME_DIR/src/populate_objects.js -d $HOME_DIR/data/menu/
-}
-function get_latest_source {
-    git pull
-}
 
 # -----------------------------------------------------------
 while [[ $# -gt 0 ]]; do
@@ -57,6 +52,8 @@ while [[ $# -gt 0 ]]; do
     case $key in 
         -r)
             REMOTE=1
+            HOST=hiraafood.com
+            PORT=80
             shift
             ;;
         -h|--help|-?)
@@ -74,28 +71,17 @@ done
 
 
 if [[ $REMOTE -eq 1 ]]; then
-    REMOTE_HOST=hiraafood.com
-    info 'deploying '$APPNAME' dockerized application to '$REMOTE_HOST
-else
-    info 'deploying '$APPNAME' dockerized application in stage'  
-fi
-if [[ $REMOTE -eq 1 ]]; then
-PEM=$DIR/anna.pem
-check_uncommited
-ssh -tt  -i $PEM $PROD_USER@$REMOTE_HOST << EOSSH
-    docker build --rm --tag hiraafood https://github.com/ppoddar/hiraafood.git
-    docker run -P hiraafood
+    info 'deploying '$APPNAME' dockerized application to '$HOST
+    PEM=$DIR/anna.pem
+    check_uncommited
+    ssh -tt  -i $PEM ec2-user@$HOST << EOSSH
+        docker build --rm --tag hiraafood https://github.com/ppoddar/hiraafood.git
+        docker container ls -aq | xargs docker container stop
+        docker container ls -aq | xargs docker container rm
+        docker run -d -p80:8080 --rm hiraafood
 EOSSH
 else
-    info 'running dockerized application. access it as port '$PORT
+    info 'deploying '$APPNAME' dockerized application in stage. http://localhost/' 
     docker build --rm --tag hiraafood .
-    docker run -d -P --rm hiraafood
+    docker run -d -p80:8080 --rm hiraafood 
 fi
-
-
-
-#sleep 2
-#populate_menu
-
-
-

@@ -1,5 +1,6 @@
 const os                = require('os')
 const express           = require('express')
+const bodyParser        = require('body-parser')
 const cors              = require('cors')
 const http              = require('http')
 const https             = require('https')
@@ -51,17 +52,17 @@ class Hiraafood {
     start() {
         this.app = express()
         this.app.set('port', this.port)
-        this.app.use(cors())
-        this.app.use(morgan)
-        
-        this.app.use(express.json());
-
         this.app.use('/', express.static(path.join(__dirname, this.docroot)))
 
+        this.app.use(bodyParser.urlencoded({extended:true}))
+        this.app.use(bodyParser.json());
+
+        this.app.use(cors())
+        this.app.use(morgan)
         this.app.use('/item', this.itemService.app)
         
          // route definitions
-         this.app.get('/info',             this.getServerInfo)
+         this.app.get('/info',      this.getServerInfo)
          this.app.use(ErrorHandler)
 
         var server 

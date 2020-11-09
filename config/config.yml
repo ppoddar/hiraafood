@@ -1,6 +1,3 @@
-item-service: 
- data_dir: ../data/menu
-
 security:
   key: config/security/hiraafood.com.key
   cert: config/security/hiraafood.com.crt

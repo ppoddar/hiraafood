@@ -1,12 +1,14 @@
 const httpStatus     = require('http-status-codes')
 const express        = require('express')
 const ItemController = require('./item-controller')
+const SubApplication = require('./sub-app')
+const logger = require('./logger')
 /*
  * Creates and manages menu items.
  */
-class ItemService {
+class ItemService extends SubApplication {
     constructor(options)  {
-        this.app     = express()
+        super(options)
         this.controller = new ItemController(options)
 
         this.app.post('/',          this.createItem.bind(this))

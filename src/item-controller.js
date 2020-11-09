@@ -8,12 +8,7 @@ const Item = require('./item')
  */
 class ItemController {
     constructor(options) {
-        if (!('data_dir' in options)) {
-            new Error('no data_dir options given')
-        }
         this.items = {}
-        this.populate(options['data_dir'])
-        
     }
     /*
      * gets all items in the menu.
