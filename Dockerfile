@@ -12,5 +12,5 @@ RUN npm install --no-optional
 
 # Docker application runs on port 80, always
 # A separate public port on the host can be mapped
-EXPOSE 8080
-CMD ["node", "app.js", "-p", "8080"]
+EXPOSE 80
+CMD ["node", "app.js"]
